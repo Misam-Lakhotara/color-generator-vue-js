@@ -3,5 +3,7 @@ import Color from "./Color.vue";
 </script>
 
 <template>
-  <Color />
+  <div>
+    <Color />
+  </div>
 </template>
