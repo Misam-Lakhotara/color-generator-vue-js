@@ -1,20 +1,26 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
+import axios from "axios";
 
 const colors = ref([]);
 const selectedColor = ref("");
 const isFetching = ref(true);
 
-const changeColor = (newColor) => {
+const changeColor = (newColor: string) => {
   selectedColor.value = newColor;
 };
 
 const fetchColors = async () => {
-  const response = await fetch("http://localhost:8080/api/colors");
-  const data = await response.json();
-  colors.value = data.colors;
-  selectedColor.value = colors.value[0]?.value;
-  isFetching.value = false;
+  try {
+    let response = await axios.get("http://localhost:8080/api/colors");
+    let data = response.data;
+    colors.value = data.colors;
+    selectedColor.value = colors.value[0]?.value || "";
+    isFetching.value = false;
+  } catch (error) {
+    console.error("Error fetching colors:", error);
+    isFetching.value = false;
+  }
 };
 
 onMounted(() => {
@@ -23,7 +29,7 @@ onMounted(() => {
 
 const color = ref("bg-gray-500");
 
-const changeBgColor = (newColor) => {
+const changeBgColor = (newColor: string) => {
   color.value = newColor;
 };
 
@@ -55,8 +61,7 @@ const getRandomColor = () => {
           {{ color?.label }}
         </button>
       </div>
-
-      <div :class="`w-96 h-96 mt-10 box-border rounded-sm`" :style="{ 'background-color': selectedColor }" />
+      <div class="w-96 h-96 mt-10 box-border rounded-sm" :style="{ 'background-color': selectedColor }"></div>
     </template>
     <div class="flex flex-row">
       <button class="box-border border-2 m-5 p-5 bg-red-800 text-white" @click="changeBgColor('bg-red-800')">
@@ -72,7 +77,6 @@ const getRandomColor = () => {
         Random color
       </button>
     </div>
-
-    <div :class="`w-96 h-96 mt-10 ${color}`"></div>
+    <div :class="['w-96 h-96 mt-10', color]"></div>
   </div>
 </template>
